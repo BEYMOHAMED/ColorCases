@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style.css">
+  <title>Colors</title>
+</head>
+<body>
+  <input type="color" name="" id="color"><br>
+  <div class="container">
+    <ul>
+          <% squares.forEach((square)=>{ %>
+          <li style="background-color: <%= square.square_color %>" id="<%= square.id %>" onClick="check(this.id)">
+          </li>
+          <% }) %>
+    </ul>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    socket.on('changeColor', (obj)=>{
+      changeColor(obj)
+    })
+
+    function changeColor(obj) {
+      document.getElementById(obj.id).style.backgroundColor = obj.color
+      console.log(obj.color)
+    }
+
+    function check(id) {
+
+      socket.emit('click', { id: id, color: document.getElementById(`color`).value })
+
+      fetch(`/${id}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': "application/json",
+        },
+        body:JSON.stringify({
+          id: id,
+          color: document.querySelector('#color').value
+        })
+      })
+    }
+  </script>
+</body>
+</html>
